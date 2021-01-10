@@ -13,7 +13,21 @@ class stockApp:
         """
         dpg.clear_table("Stocks")
         for stock in self.stocks:
-            dpg.add_row("Stocks", [stock["Prediction"], stock["Confidence"]])
+            dpg.add_row(
+                "Stocks", [stock["Stock"], stock["Prediction"], stock["Confidence"]]
+            )
+
+    def __toggle_stock(self, sender, data):
+        """Toggle a todo to True of False.
+        Get the selected cell of the table (list of [row index, column index])
+        and uses the row index to update the todo at that index in the todos
+        list. Then, saves the selected row index in the case you would want to
+        delete that todo.
+        """
+        stock_row = dpg.get_table_selections("Stocks")
+        stock = self.stocks[stock_row[0][0]]
+        dpg.add_data("selected-stock-index", self.stocks.index(stock))
+        dpg.set_value("Selected stock:", f"Selected Stock: {stock['Stock']}")
 
     def __add_stock(self, sender, data):
         """Add a new todo.
@@ -21,7 +35,7 @@ class stockApp:
         and then clear the text of the input.
         """
         new_tickr = dpg.get_value("stock-ticker")
-        stock_pred, confidence = stock_market_predictions.stockPredict("AAPL")
+        stock_pred, confidence = stock_market_predictions.stockPredict(new_tickr)
         new_entry = {
             "Stock": new_tickr,
             "Prediction": stock_pred,
@@ -42,27 +56,36 @@ class stockApp:
     def show(self):
         """Start the gui."""
         with sdpg.window("Main Window"):
-            dpg.set_main_window_size(550, 550)
+            dpg.set_main_window_size(550, 600)
             dpg.set_main_window_resizable(False)
-            dpg.set_main_window_title("Stock Prediction App")
+            dpg.set_main_window_title("Stockify")
 
-            dpg.add_text("Stock App")
+            dpg.add_text("Stockify: The Future of Stocks")
             dpg.add_text(
-                "Add a stock by writing a title and clicking",
-                " the add stock button",
+                "Predict a stock by typing in its ticker and clicking"
+                " the predict stock button",
                 bullet=True,
             )
-            dpg.add_text("Toggle a stock by clicking on its table row", bullet=True)
             dpg.add_text(
                 "Remove a stock by clicking on its table row and clicking"
                 " the remove stock button",
+                bullet=True,
+            )
+            dpg.add_text(
+                "All predictions will predict a stocks value " "in 30 days",
+                bullet=True,
+            )
+
+            dpg.add_text(
+                "Confidence is the degree that Stockify"
+                " is sure about its prediction",
                 bullet=True,
             )
             dpg.add_separator()
 
             dpg.add_spacing(count=10)
             dpg.add_input_text("Stock Ticker", source="stock-ticker")
-            dpg.add_button("Add Stock", callback=self.__add_stock)
+            dpg.add_button("Predict Stock", callback=self.__add_stock)
             dpg.add_spacing(count=10)
             dpg.add_separator()
 
@@ -70,6 +93,7 @@ class stockApp:
                 "Stocks",
                 ["Stock", "Prediction", "Confidence"],
                 height=200,
+                callback=self.__toggle_stock,
             )
             dpg.add_separator()
             dpg.add_text("Selected stock:")
@@ -82,7 +106,6 @@ class stockApp:
 
 
 if __name__ == "__main__":
-    amzn = "AMZN"
     stocks = []
 
     stock_app = stockApp(stocks)
