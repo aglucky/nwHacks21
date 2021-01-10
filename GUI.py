@@ -1,5 +1,6 @@
 import dearpygui.core as dpg
 import dearpygui.simple as sdpg
+import stock_market_predictions
 
 
 class stockApp:
@@ -19,16 +20,15 @@ class stockApp:
         Get the data from the input text, append a new todo to the todos list
         and then clear the text of the input.
         """
-        new_tickr = dpg.get_value("Stock Ticker")
-        stock_pred = 100
-        confidence = 90
+        new_tickr = dpg.get_value("stock-ticker")
+        stock_pred, confidence = stock_market_predictions.stockPredict("AAPL")
         new_entry = {
             "Stock": new_tickr,
             "Prediction": stock_pred,
             "Confidence": confidence,
         }
         self.stocks.append(new_entry)
-        dpg.set_value("new-stock-tickr", "")
+        dpg.set_value("stock-ticker", "")
 
     def __remove_stock(self, sender, data):
         """Remove a todo from the todos list based on the selected row."""
@@ -61,7 +61,7 @@ class stockApp:
             dpg.add_separator()
 
             dpg.add_spacing(count=10)
-            dpg.add_input_text("New Stock Tickr", source="new-stock-tickr")
+            dpg.add_input_text("Stock Ticker", source="stock-ticker")
             dpg.add_button("Add Stock", callback=self.__add_stock)
             dpg.add_spacing(count=10)
             dpg.add_separator()
