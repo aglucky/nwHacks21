@@ -91,5 +91,3 @@ def stockPredict(ticker):
 pred,conf = stockPredict("AAP")
 print(pred,conf)
 
-stock_market_3_0.py
-Displaying stock_market_3_0.py.
